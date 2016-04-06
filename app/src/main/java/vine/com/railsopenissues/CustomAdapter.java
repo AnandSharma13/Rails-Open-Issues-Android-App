@@ -1,7 +1,6 @@
 package vine.com.railsopenissues;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +18,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     private MainActivity.RequestType recyclerViewType;
     final static int longMillis = 500;
 
-    public CustomAdapter(ArrayList issueList, CustomClickListener clickListener, MainActivity.RequestType recylerViewType) {
+    public CustomAdapter(ArrayList issueList, CustomClickListener clickListener, MainActivity.RequestType recyclerViewType) {
         mIssueList = issueList;
         mClickListener = clickListener;
-        this.recyclerViewType = recylerViewType;
+        this.recyclerViewType = recyclerViewType;
         itemsEnabled = true;
     }
 
@@ -38,7 +37,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if (recyclerViewType == MainActivity.RequestType.PARTIAL) return 0;
+        if (recyclerViewType == MainActivity.RequestType.COMMENTS) return 0;
         else return 1;
     }
 
@@ -48,7 +47,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         holder.itemView.setEnabled(itemsEnabled);
     }
 
-    public void setItemsEnabled(boolean val) {
+    protected void setItemsEnabled(boolean val) {
         itemsEnabled = val;
         notifyItemRangeChanged(0, getItemCount());
     }
@@ -60,7 +59,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             holder.mIssueTitle.setText("Tittle: " + ((IssueData) obj).getTitle());
             holder.mIssueBody.setText(((IssueData) obj).getBodyText());
         } else {
-            Log.d("CommentsData", "Comments data needed");
+
+                holder.mIssueTitle.setText(((CommentsData) obj).getUserName()+": ");
+                holder.mIssueBody.setText(((CommentsData) obj).getComments());
         }
     }
 
@@ -86,13 +87,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             if (!itemsEnabled) {
                 return;
             }
-//            setItemsEnabled(false);
-//            v.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    setItemsEnabled(true);
-//                }
-//            }, longMillis);
+            setItemsEnabled(false);
+            v.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setItemsEnabled(true);
+                }
+            }, longMillis);
             mClickListener.onClick(v, getAdapterPosition());
         }
     }

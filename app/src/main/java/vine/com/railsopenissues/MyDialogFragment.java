@@ -13,13 +13,14 @@ import java.util.ArrayList;
 
 /**
  * Created by Anand on 4/6/2016.
+ *
+ * MyDialogFragment.java - This class is used to shows the Comments for an issue in a Dialog Fragment
  */
 public class MyDialogFragment extends DialogFragment implements  CustomClickListener{
 
     private RecyclerView mCommentsRecyclerView;
     private ArrayList<IssueData> mList;
     private Button btnClose;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle("COMMENTS");
@@ -29,6 +30,7 @@ public class MyDialogFragment extends DialogFragment implements  CustomClickList
         mCommentsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mCommentsRecyclerView.setAdapter(new CustomAdapter(mList, this, MainActivity.RequestType.COMMENTS));
 
+        //click handler of the close button in fragment
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -38,6 +40,11 @@ public class MyDialogFragment extends DialogFragment implements  CustomClickList
         return rootView;
     }
 
+    /**
+     * This function returns an Instance of the MyFragmentClass and sets the parameters of the fragment
+     * @param list ArrayList of comments wrapped in CommentsData object
+     * @return MyDialogFragment
+     */
     public static MyDialogFragment newInstance(ArrayList<CommentsData> list) {
         MyDialogFragment myFragment = new MyDialogFragment();
         Bundle args = new Bundle();

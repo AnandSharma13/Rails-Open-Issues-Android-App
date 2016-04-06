@@ -2,6 +2,8 @@ package vine.com.railsopenissues;
 
 /**
  * Created by Anand on 4/6/2016.
+ *
+ * IssueData.java - This class holds one Rails organization issue data
  */
 public class IssueData {
     private String mTitle;

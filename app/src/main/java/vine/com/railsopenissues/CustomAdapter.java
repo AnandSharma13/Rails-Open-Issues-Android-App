@@ -10,14 +10,24 @@ import java.util.ArrayList;
 
 /**
  * Created by Anand on 4/6/2016.
+ *
+ * CustomAdapter.java - This class is a custom adapter for the Recycler view.
+ *
+ * This Adapter is used to display both, Issues and Comments data, in recycler views.
  */
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
     private ArrayList mIssueList;
     private CustomClickListener mClickListener;
     private boolean itemsEnabled;
     private MainActivity.RequestType recyclerViewType;
-    final static int longMillis = 500;
+    final static int longMillis = 1000;
 
+    /**
+     * Constructor of CustomAdapter class
+     * @param issueList list of objects to be populated in the Recycler view
+     * @param clickListener Click listener of recycler view
+     * @param recyclerViewType Type of the view to be populated
+     */
     public CustomAdapter(ArrayList issueList, CustomClickListener clickListener, MainActivity.RequestType recyclerViewType) {
         mIssueList = issueList;
         mClickListener = clickListener;
@@ -35,6 +45,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         return new MyViewHolder(v);
     }
 
+    /**
+     * Returns the view type of the item at position for the purposes of view recycling.
+     * @param position
+     * @return return 1 if the recycler view is for comments and returns 0 if the recycler view is being used to display issues
+     */
     @Override
     public int getItemViewType(int position) {
         if (recyclerViewType == MainActivity.RequestType.COMMENTS) return 0;
@@ -47,21 +62,31 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         holder.itemView.setEnabled(itemsEnabled);
     }
 
+    /**
+     * Enables/Disables the on click event of recycler view items
+     * @param val
+     */
     protected void setItemsEnabled(boolean val) {
         itemsEnabled = val;
         notifyItemRangeChanged(0, getItemCount());
     }
 
+    /**
+     * Bind the holder with appropriate object (Comments/Issue)
+     * @param holder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Object obj = mIssueList.get(position);
+
         if (obj instanceof IssueData) {
-            holder.mIssueTitle.setText("Tittle: " + ((IssueData) obj).getTitle());
-            holder.mIssueBody.setText(((IssueData) obj).getBodyText());
+            holder.mTitle.setText("Tittle: " + ((IssueData) obj).getTitle());
+            holder.mBody.setText(((IssueData) obj).getBodyText());
         } else {
 
-                holder.mIssueTitle.setText(((CommentsData) obj).getUserName()+": ");
-                holder.mIssueBody.setText(((CommentsData) obj).getComments());
+                holder.mTitle.setText(((CommentsData) obj).getUserName() + ": ");
+                holder.mBody.setText(((CommentsData) obj).getComments());
         }
     }
 
@@ -70,15 +95,18 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         return mIssueList.size();
     }
 
+    /**
+     * MyViewHolder - Inner class that defines the data inside the Recycler view
+     */
     protected class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public TextView mIssueTitle;
-        public TextView mIssueBody;
+        public TextView mTitle;
+        public TextView mBody;
 
         public MyViewHolder(View view) {
             super(view);
-            mIssueTitle = (TextView) view.findViewById(R.id.tv_issue_title);
-            mIssueBody = (TextView) view.findViewById(R.id.tv_issue_body);
+            mTitle = (TextView) view.findViewById(R.id.tv_issue_title);
+            mBody = (TextView) view.findViewById(R.id.tv_issue_body);
             view.setOnClickListener(this);
         }
 
@@ -87,13 +115,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             if (!itemsEnabled) {
                 return;
             }
+            //disable the items to handle fast multiple click events
             setItemsEnabled(false);
-            v.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setItemsEnabled(true);
-                }
-            }, longMillis);
             mClickListener.onClick(v, getAdapterPosition());
         }
     }

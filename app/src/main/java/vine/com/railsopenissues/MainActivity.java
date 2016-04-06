@@ -29,6 +29,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ * Created by Anand on 4/6/2016.
+ *
+ * MainActivity.java - This class launches the application and displays a list of Issues.
+ *
+ */
+
 public class MainActivity extends AppCompatActivity implements CustomClickListener {
 
     private RecyclerView mIssuesRecyclerView;
@@ -67,6 +74,12 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
         });
     }
 
+    /**
+     * This functions retries data from a specified URL and parses the JSON file
+     * @param URL Request URL
+     * @param type This defines the type of request. The request type can be for Comments or Issues
+     * @param list A list that holds the items of Recycler view
+     */
     protected void fetchIssueData(String URL, final RequestType type, final ArrayList list) {
         Log.i("URL", URL);
         try {
@@ -74,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.d("Response", response);
                             if (response != null) {
                                 mSwipeRefreshLayout.setRefreshing(false);
                                 mProgressBar.setVisibility(View.GONE);
@@ -103,12 +115,24 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
             requestString.setRetryPolicy(new DefaultRetryPolicy(REQUEST_TIMEOUT, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
         }
-
-
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Cancels all http volley requests when the application is closed.
+        RequestQSingleton.getInstance(this).cancelAllRequests();
+    }
+
+    /**
+     * This functions parses the response JSON according to the request type
+     * @param mlist Reference of ArrayList to be populated in Recycler view
+     * @param resArr JSON response from HTTP volley
+     * @param type  Type of request (ISSUES, COMMENTS)
+     */
     protected void parseIssueJSON(ArrayList mlist, JSONArray resArr, RequestType type) {
         mlist.clear();
         Object dataObj = null;
@@ -143,6 +167,10 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
         }
     }
 
+    /**
+     * Displays the comments in a Recycler view in a Fragment dialog
+     * @param list Items to be populated in RecyclerView
+     */
     protected void displayComments(ArrayList<CommentsData> list) {
         try {
             FragmentManager fm = getFragmentManager();
@@ -152,8 +180,18 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
         } catch (Exception e) {
             e.printStackTrace();
         }
+        finally {
+            mCustomAdapter.setItemsEnabled(true);
+        }
+
     }
 
+    /**
+     * Displays an alert dialog
+     * @param title Title of the dialog
+     * @param message Message to be displayed
+     * @return return a AlertDialog.Builder
+     */
     protected AlertDialog.Builder showAlert(String title, String message) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         alertDialog.setTitle(title);
@@ -170,6 +208,11 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
         return alertDialog;
     }
 
+    /**
+     * Inflates the menu
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -177,6 +220,11 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
         return true;
     }
 
+    /**
+     * Defines the click handlers of different menu items
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -189,6 +237,11 @@ public class MainActivity extends AppCompatActivity implements CustomClickListen
         }
     }
 
+    /**
+     * This function handles the RecyclerView click events
+     * @param v The view which is clicked
+     * @param adapterPosition Position of the item clicked
+     */
     @Override
     public void onClick(View v, int adapterPosition) {
         mProgressBar.setVisibility(View.VISIBLE);
